@@ -156,7 +156,7 @@ def user_follow(request):
                     user_from=request.user,
                     user_to=user)
             else:
-                Contact.objects..filter(user_from=request.user, user_to=user).delete()
+                Contact.objects.filter(user_from=request.user, user_to=user).delete()
             return JsonResponse({
                 'status': 'ok'
             })
