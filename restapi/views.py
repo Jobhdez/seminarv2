@@ -1,4 +1,4 @@
-from restapi.models import Paper, Expression
+from restapi.models import Paper, Expression. Contact
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -17,6 +17,9 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from .math_logic.interpreter import *
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+
 
 @api_view(['GET'])
 def list_papers(request, tag_slug=None):
@@ -140,3 +143,25 @@ def compute_expression(request):
         return Response(serializer.data)
 
 
+@require_POST
+@login_required
+def user_follow(request):
+    user_id = request.POST.get('id')
+    action = request.POST.get('action')
+    if user_id in action:
+        try:
+            user = User.objects.get(id=user_id)
+            if action == 'follow':
+                Contact.objects.get_or_create(
+                    user_from=request.user,
+                    user_to=user)
+            else:
+                Contact.objects..filter(user_from=request.user, user_to=user).delete()
+            return JsonResponse({
+                'status': 'ok'
+            })
+        except User.DoesNotExist:
+            return JsonResponse({'status': 'error'})
+
+    return JsonResponse({'status':'error'})
+                
