@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'taggit',
     'django.contrib.postgres',
     'research',
+    'actions',
 ]
 
 MIDDLEWARE = [
