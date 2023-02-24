@@ -5,4 +5,6 @@
 - implement the like system
 - implement frontend in react
 - finish the mini computer algebra system
+- add recomendation engine using redis
+- most read papers functionality with redis
 
