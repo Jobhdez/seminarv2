@@ -1,4 +1,5 @@
-from restapi.models import Paper, Expression. Contact
+from restapi.models import Paper, Expression, Contact
+from actions.models import Action
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -19,6 +20,7 @@ from django.contrib.auth.models import User
 from .math_logic.interpreter import *
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+from actions.utils import create_action
 
 
 @api_view(['GET'])
@@ -113,6 +115,7 @@ def register(request):
         new_user.set_password(cd['password'])
 
         new_user.save()
+        create_action(new_user, 'has created an account')
 
         return Response({'account': 'created'}) 
 
@@ -155,6 +158,7 @@ def user_follow(request):
                 Contact.objects.get_or_create(
                     user_from=request.user,
                     user_to=user)
+                create_action(request.user, 'is following', user)
             else:
                 Contact.objects.filter(user_from=request.user, user_to=user).delete()
             return JsonResponse({
@@ -165,3 +169,33 @@ def user_follow(request):
 
     return JsonResponse({'status':'error'})
                 
+@login_required
+def dashboard(request):
+    actions = Action.objects.exclude(user=request.user)
+    following_ids = request.user.following.values_list('id', flat=True)
+
+    if following_ids:
+        actions = actions.filter(user_id__in=following_ids)
+    actions = actions[:10]
+
+    return Response(serializers.serialize('json', actions))
+
+@api_view(['POST'])
+def create_study_group(request):
+    form = StudyGroupForm(Request.POST)
+    if form.is_valid():
+        study_group = form.save(commit=False)
+        data = form.cleaned_data
+        papers = data['papers']
+        study_group_name = data['name']
+        users = data['users']
+        study_group.papers = papers
+        study_group.users = users
+        study_group.name = name 
+        study_group.save()
+
+        return JsonResponse({'status': 'ok'})
+
+    else:
+        return Response({'error': 'invalid form'})
+        
