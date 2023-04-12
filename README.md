@@ -6,3 +6,6 @@ so far users can register and make an account, login, browse through a listing o
 basic recommendation ssystem based on tags is also implemented. The following system is implemented.
 
 I still need to implement chat functionality, the actual functionality for forming study groups; each study group will be able to chat.
+
+## Note
+I had build part of the API back in december by I then got a new computer and since my django key was in an `.env` file I lost the key so what I did for this project was copy and past the api from my other project but then I also added code to this backend. thanks
